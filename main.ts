@@ -200,152 +200,188 @@ class KarmaNotesView extends ItemView {
 		const header = document.createElement("div");
 		header.addClass("karma-notes-header");
 
+		const titleRow = document.createElement("div");
+		titleRow.addClass("karma-header-row");
+
 		const title = document.createElement("h3");
 		title.textContent = "Karma Notes";
-		header.appendChild(title);
+		titleRow.appendChild(title);
 
-		// Sort control
-		const controls = document.createElement("div");
-		controls.addClass("karma-notes-controls");
+		const noteCount = document.createElement("span");
+		noteCount.addClass("karma-note-count");
+		noteCount.textContent = `${sortedNotes.length}`;
+		titleRow.appendChild(noteCount);
 
+		header.appendChild(titleRow);
+
+		// Filters row - compact dropdowns
+		const filtersRow = document.createElement("div");
+		filtersRow.addClass("karma-filters-row");
+
+		// Sort dropdown
 		const sortSelect = document.createElement("select");
-		sortSelect.addClass("karma-sort-select");
+		sortSelect.addClass("karma-dropdown");
 		sortSelect.innerHTML = `
-			<option value="karma-desc">Karma (highest)</option>
-			<option value="karma-asc">Karma (lowest)</option>
-			<option value="alpha">Alphabetical</option>
-			<option value="date">Last opened</option>
+			<option value="karma-desc">↓ Karma</option>
+			<option value="karma-asc">↑ Karma</option>
+			<option value="alpha">A-Z</option>
+			<option value="date">Recent</option>
 		`;
 		sortSelect.value = this.currentSort;
 		sortSelect.addEventListener("change", () => {
 			this.currentSort = sortSelect.value;
 			this.render();
 		});
-		controls.appendChild(sortSelect);
-		header.appendChild(controls);
+		filtersRow.appendChild(sortSelect);
 
-		// Filters
-		const filtersContainer = document.createElement("div");
-		filtersContainer.addClass("karma-notes-filters");
+		// Karma range dropdown
+		const karmaSelect = document.createElement("select");
+		karmaSelect.addClass("karma-dropdown");
+		karmaSelect.innerHTML = `
+			<option value="all">All karma</option>
+			<option value="high">🔥 >5</option>
+			<option value="medium">⭐ 2-5</option>
+			<option value="low">📊 0-1</option>
+			<option value="negative">❄️ <0</option>
+		`;
+		karmaSelect.value = this.currentKarmaFilter;
+		karmaSelect.addEventListener("change", () => {
+			this.currentKarmaFilter = karmaSelect.value;
+			this.render();
+		});
+		filtersRow.appendChild(karmaSelect);
 
-		// Karma range filter chips
-		const karmaChips = document.createElement("div");
-		karmaChips.addClass("karma-filter-chips");
+		header.appendChild(filtersRow);
 
-		const karmaFilters = [
-			{ id: "all", label: "All", icon: "📊" },
-			{ id: "high", label: ">5", icon: "⚡" },
-			{ id: "medium", label: "2-5", icon: "⭐" },
-			{ id: "low", label: "0-1", icon: "📊" },
-			{ id: "negative", label: "<0", icon: "❄️" },
-		];
-
-		for (const f of karmaFilters) {
-			const chip = document.createElement("button");
-			chip.addClass("karma-filter-chip");
-			if (this.currentKarmaFilter === f.id) chip.addClass("active");
-			chip.innerHTML = `${f.icon} ${f.label}`;
-			chip.addEventListener("click", () => {
-				this.currentKarmaFilter = f.id;
-				this.render();
-			});
-			karmaChips.appendChild(chip);
-		}
-		filtersContainer.appendChild(karmaChips);
-
-		// Property filters
-		const propertyMap = new Map<
-			string,
-			{ property: string; value: string; count: number }
-		>();
+		// Property filters - grouped by property with multiselect dropdowns
+		const propertyGroups = new Map<string, Map<string, number>>();
 		for (const note of allNotes) {
 			if (!note.hasFrontmatter || !note.frontmatter) continue;
 			for (const prop of this.plugin.settings.filterProperties) {
 				if (note.frontmatter[prop]) {
+					if (!propertyGroups.has(prop)) {
+						propertyGroups.set(prop, new Map());
+					}
 					const propVal = note.frontmatter[prop];
-					if (Array.isArray(propVal)) {
-						for (const v of propVal) {
-							const key = `${prop}:${v}`;
-							if (!propertyMap.has(key)) {
-								propertyMap.set(key, { property: prop, value: v as string, count: 0 });
-							}
-							propertyMap.get(key)!.count++;
-						}
-					} else {
-						const key = `${prop}:${propVal}`;
-						if (!propertyMap.has(key)) {
-							propertyMap.set(key, { property: prop, value: propVal as string, count: 0 });
-						}
-						propertyMap.get(key)!.count++;
+					const values = Array.isArray(propVal) ? propVal : [propVal];
+					for (const v of values) {
+						const valStr = String(v);
+						const current = propertyGroups.get(prop)!.get(valStr) || 0;
+						propertyGroups.get(prop)!.set(valStr, current + 1);
 					}
 				}
 			}
 		}
 
-		if (propertyMap.size > 0) {
-			const propFilters = document.createElement("div");
-			propFilters.addClass("karma-property-filters");
+		if (propertyGroups.size > 0) {
+			const propsRow = document.createElement("div");
+			propsRow.addClass("karma-props-row");
 
-			for (const [key, info] of propertyMap) {
-				const chip = document.createElement("button");
-				chip.addClass("karma-property-chip");
-				if (this.selectedFilters.has(key)) chip.addClass("active");
-				chip.innerHTML = `${info.property}: ${info.value} (${info.count})`;
-				chip.addEventListener("click", () => {
-					if (this.selectedFilters.has(key)) {
-						this.selectedFilters.delete(key);
-					} else {
-						this.selectedFilters.add(key);
-					}
+			for (const [prop, values] of propertyGroups) {
+				const wrapper = document.createElement("div");
+				wrapper.addClass("karma-multiselect-wrapper");
+
+				const toggle = document.createElement("button");
+				toggle.addClass("karma-multiselect-toggle");
+				
+				const selectedForProp = Array.from(this.selectedFilters)
+					.filter(f => f.startsWith(`${prop}:`)).length;
+				
+				toggle.innerHTML = selectedForProp > 0 
+					? `${prop} <span class="karma-filter-count">${selectedForProp}</span>`
+					: prop;
+				
+				if (selectedForProp > 0) toggle.addClass("has-selection");
+
+				const dropdown = document.createElement("div");
+				dropdown.addClass("karma-multiselect-dropdown");
+				dropdown.style.display = "none";
+
+				const sortedValues = Array.from(values.entries()).sort((a, b) => b[1] - a[1]);
+
+				for (const [val, count] of sortedValues) {
+					const key = `${prop}:${val}`;
+					const option = document.createElement("label");
+					option.addClass("karma-multiselect-option");
+
+					const checkbox = document.createElement("input");
+					checkbox.type = "checkbox";
+					checkbox.checked = this.selectedFilters.has(key);
+					checkbox.addEventListener("change", () => {
+						if (checkbox.checked) {
+							this.selectedFilters.add(key);
+						} else {
+							this.selectedFilters.delete(key);
+						}
+						this.render();
+					});
+
+					option.appendChild(checkbox);
+					option.appendChild(document.createTextNode(` ${val}`));
+					
+					const countSpan = document.createElement("span");
+					countSpan.addClass("karma-option-count");
+					countSpan.textContent = String(count);
+					option.appendChild(countSpan);
+
+					dropdown.appendChild(option);
+				}
+
+				toggle.addEventListener("click", (e) => {
+					e.stopPropagation();
+					document.querySelectorAll(".karma-multiselect-dropdown").forEach(d => {
+						if (d !== dropdown) (d as HTMLElement).style.display = "none";
+					});
+					dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+				});
+
+				wrapper.appendChild(toggle);
+				wrapper.appendChild(dropdown);
+				propsRow.appendChild(wrapper);
+			}
+
+			if (this.selectedFilters.size > 0) {
+				const clearBtn = document.createElement("button");
+				clearBtn.addClass("karma-clear-filters");
+				clearBtn.textContent = "✕";
+				clearBtn.title = "Clear all filters";
+				clearBtn.addEventListener("click", () => {
+					this.selectedFilters.clear();
 					this.render();
 				});
-				propFilters.appendChild(chip);
+				propsRow.appendChild(clearBtn);
 			}
-			filtersContainer.appendChild(propFilters);
+
+			header.appendChild(propsRow);
 		}
 
 		this.contentEl.appendChild(header);
-		this.contentEl.appendChild(filtersContainer);
 
-		// Notes list
+		// Close dropdowns when clicking outside
+		this.contentEl.addEventListener("click", () => {
+			document.querySelectorAll(".karma-multiselect-dropdown").forEach(d => {
+				(d as HTMLElement).style.display = "none";
+			});
+		});
+
+		// Notes list - compact
 		const list = document.createElement("div");
 		list.addClass("karma-notes-list");
-
-		const today = this.plugin.getToday();
 
 		for (const note of sortedNotes) {
 			const item = document.createElement("div");
 			item.addClass("karma-note-item");
 
-			const noteHeader = document.createElement("div");
-			noteHeader.addClass("karma-note-header");
-
-			const noteName = document.createElement("span");
-			noteName.addClass("karma-note-name");
-			noteName.textContent = note.name;
-			noteName.style.cursor = "pointer";
-			noteName.addEventListener("click", async () => {
-				await this.app.workspace.getLeaf(false).openFile(note.file);
-			});
-			noteHeader.appendChild(noteName);
-
-			const noteMeta = document.createElement("div");
-			noteMeta.addClass("karma-note-meta");
-
-			const scoreSpan = document.createElement("span");
-			scoreSpan.addClass("karma-note-score");
-			scoreSpan.innerHTML = `${this.getScoreIcon(note.score)} ${note.score}`;
-			noteMeta.appendChild(scoreSpan);
-
-			// Vote buttons with new logic
 			const canUpvote = note.score < note.dailyBaseScore + 1;
 			const canDownvote = note.score > note.dailyBaseScore - 1;
+
+			const voteContainer = document.createElement("div");
+			voteContainer.addClass("karma-vote-container");
 
 			const upBtn = document.createElement("button");
 			upBtn.addClass("karma-vote-btn", "karma-vote-up");
 			if (!canUpvote) upBtn.addClass("disabled");
-			upBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>`;
-			upBtn.disabled = !canUpvote;
+			upBtn.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>`;
 			upBtn.addEventListener("click", async (e) => {
 				e.stopPropagation();
 				if (canUpvote) {
@@ -354,11 +390,14 @@ class KarmaNotesView extends ItemView {
 				}
 			});
 
+			const scoreSpan = document.createElement("span");
+			scoreSpan.addClass("karma-note-score");
+			scoreSpan.textContent = String(note.score);
+
 			const downBtn = document.createElement("button");
 			downBtn.addClass("karma-vote-btn", "karma-vote-down");
 			if (!canDownvote) downBtn.addClass("disabled");
-			downBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>`;
-			downBtn.disabled = !canDownvote;
+			downBtn.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>`;
 			downBtn.addEventListener("click", async (e) => {
 				e.stopPropagation();
 				if (canDownvote) {
@@ -367,42 +406,19 @@ class KarmaNotesView extends ItemView {
 				}
 			});
 
-			noteMeta.appendChild(upBtn);
-			noteMeta.appendChild(downBtn);
-			noteHeader.appendChild(noteMeta);
-			item.appendChild(noteHeader);
+			voteContainer.appendChild(upBtn);
+			voteContainer.appendChild(scoreSpan);
+			voteContainer.appendChild(downBtn);
+			item.appendChild(voteContainer);
 
-			// Badges
-			const badges = document.createElement("div");
-			badges.addClass("karma-note-badges");
+			const noteName = document.createElement("span");
+			noteName.addClass("karma-note-name");
+			noteName.textContent = note.name;
+			noteName.addEventListener("click", async () => {
+				await this.app.workspace.getLeaf(false).openFile(note.file);
+			});
+			item.appendChild(noteName);
 
-			if (!note.hasFrontmatter) {
-				const badge = document.createElement("span");
-				badge.addClass("karma-note-badge", "karma-badge-warning");
-				badge.innerHTML = "⚠️ No frontmatter";
-				badges.appendChild(badge);
-			} else if (note.frontmatter) {
-				for (const prop of this.plugin.settings.filterProperties) {
-					if (note.frontmatter[prop]) {
-						const propVal = note.frontmatter[prop];
-						if (Array.isArray(propVal)) {
-							for (const v of propVal) {
-								const badge = document.createElement("span");
-								badge.addClass("karma-note-badge");
-								badge.textContent = `${prop}: ${v}`;
-								badges.appendChild(badge);
-							}
-						} else {
-							const badge = document.createElement("span");
-							badge.addClass("karma-note-badge");
-							badge.textContent = `${prop}: ${propVal}`;
-							badges.appendChild(badge);
-						}
-					}
-				}
-			}
-
-			item.appendChild(badges);
 			list.appendChild(item);
 		}
 

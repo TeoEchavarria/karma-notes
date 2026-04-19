@@ -159,3 +159,233 @@
 		height: 22px;
 	}
 }
+
+/* ═══════════════════════════════════════════
+   KARMA NOTES SIDEBAR VIEW
+═══════════════════════════════════════════ */
+
+.karma-notes-view .view-content {
+	padding: 0;
+}
+
+.karma-notes-header {
+	padding: 8px 10px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+	position: sticky;
+	top: 0;
+	z-index: 10;
+}
+
+.karma-header-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 8px;
+}
+
+.karma-header-row h3 {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.karma-note-count {
+	background: var(--background-modifier-hover);
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--text-muted);
+}
+
+.karma-filters-row {
+	display: flex;
+	gap: 6px;
+}
+
+.karma-dropdown {
+	flex: 1;
+	padding: 4px 6px;
+	font-size: 11px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	background: var(--background-secondary);
+	color: var(--text-normal);
+	cursor: pointer;
+}
+
+.karma-dropdown:hover {
+	border-color: var(--interactive-accent);
+}
+
+.karma-props-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-top: 8px;
+}
+
+.karma-multiselect-wrapper {
+	position: relative;
+}
+
+.karma-multiselect-toggle {
+	padding: 3px 8px;
+	font-size: 10px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	background: var(--background-secondary);
+	color: var(--text-muted);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.karma-multiselect-toggle:hover {
+	background: var(--background-modifier-hover);
+}
+
+.karma-multiselect-toggle.has-selection {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-color: var(--interactive-accent);
+}
+
+.karma-filter-count {
+	background: rgba(255,255,255,0.2);
+	padding: 1px 5px;
+	border-radius: 8px;
+	font-size: 9px;
+}
+
+.karma-multiselect-dropdown {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	min-width: 150px;
+	max-height: 200px;
+	overflow-y: auto;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+	z-index: 100;
+	margin-top: 2px;
+}
+
+.karma-multiselect-option {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 10px;
+	font-size: 11px;
+	cursor: pointer;
+}
+
+.karma-multiselect-option:hover {
+	background: var(--background-modifier-hover);
+}
+
+.karma-multiselect-option input[type="checkbox"] {
+	margin: 0;
+}
+
+.karma-option-count {
+	margin-left: auto;
+	font-size: 10px;
+	color: var(--text-faint);
+}
+
+.karma-clear-filters {
+	padding: 3px 8px;
+	font-size: 10px;
+	border: none;
+	border-radius: 4px;
+	background: var(--text-error);
+	color: white;
+	cursor: pointer;
+}
+
+.karma-clear-filters:hover {
+	opacity: 0.8;
+}
+
+/* Notes List - Compact */
+.karma-notes-list {
+	padding: 4px 0;
+}
+
+.karma-note-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 10px;
+	border-bottom: 1px solid var(--background-modifier-border-focus);
+}
+
+.karma-note-item:hover {
+	background: var(--background-modifier-hover);
+}
+
+.karma-vote-container {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	flex-shrink: 0;
+}
+
+.karma-notes-list .karma-vote-btn {
+	padding: 2px;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	color: var(--text-muted);
+	border-radius: 3px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: auto;
+	height: auto;
+}
+
+.karma-notes-list .karma-vote-btn:hover:not(.disabled) {
+	background: var(--background-modifier-hover);
+}
+
+.karma-notes-list .karma-vote-btn.karma-vote-up:hover:not(.disabled) {
+	color: #ff6314;
+}
+
+.karma-notes-list .karma-vote-btn.karma-vote-down:hover:not(.disabled) {
+	color: #5b9cf6;
+}
+
+.karma-notes-list .karma-vote-btn.disabled {
+	opacity: 0.3;
+	cursor: not-allowed;
+}
+
+.karma-note-item .karma-note-score {
+	font-size: 11px;
+	font-weight: 700;
+	min-width: 20px;
+	text-align: center;
+	color: var(--text-normal);
+	padding: 0;
+}
+
+.karma-note-name {
+	flex: 1;
+	font-size: 12px;
+	color: var(--text-normal);
+	cursor: pointer;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.karma-note-name:hover {
+	color: var(--interactive-accent);
+}

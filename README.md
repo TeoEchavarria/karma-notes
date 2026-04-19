@@ -4,12 +4,15 @@ An Obsidian plugin that adds a Reddit-style voting system to your notes.
 
 ## Features
 
-- **Upvote/Downvote**: Vote on your notes like on Reddit
-- **1 vote per day**: You can only vote once per day per note
-- **Initial karma**: Each note starts with 2 points
-- **Decay**: Notes lose 1 point if not opened in 2 weeks
-- **Status bar**: Shows the active note's karma
+- **Daily ±1 range**: Each note can move ±1 point per day from its daily base score
+- **Vote freely**: Click ↑ or ↓ multiple times, but score stays within daily range
+- **Auto-decay**: Notes lose 1 point if not opened in 2 weeks
+- **Starts at 2**: New notes begin with 2 karma points
+- **Sidebar view**: Sort, filter, and manage all notes by karma
+- **Status bar**: Shows active note's karma with emoji (🔥 ⭐ ❄️)
 
-## Usage
+## How it works
 
-Open any note and use the vote buttons to increase or decrease its karma. Useful for prioritizing important notes or identifying those that need review.
+Each day, a note's score can only be between `[base-1, base+1]`. For example, if a note has 5 points today, it can be voted to 4, 5, or 6—but no lower or higher until tomorrow when the base resets.
+
+Use the sidebar (trophy icon) to view all notes with filters by karma range, tags, and other frontmatter properties.
