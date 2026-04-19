@@ -3,7 +3,7 @@
 	"name": "Karma Notes",
 	"version": "1.0.0",
 	"minAppVersion": "1.4.0",
-	"description": "Reddit-style upvote/downvote for your notes. 1 vote per day, -1 for 2 weeks of inactivity, starts at 2 points.",
+	"description": "Reddit-style upvote/downvote for your notes. 1 vote per day, auto-decay after 2 weeks of inactivity.",
 	"author": "TeoEchavarria",
 	"authorUrl": "",
 	"isDesktopOnly": false
