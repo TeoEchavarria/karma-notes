@@ -790,5 +790,42 @@ class KarmaSettingTab extends PluginSettingTab {
 						this.plugin.updateButtonsForActiveFile();
 					})
 			);
+
+		new Setting(containerEl)
+			.setName("Notes folder")
+			.setDesc("Folder to display in the Karma Notes sidebar (relative to vault root).")
+			.addText((text) =>
+				text
+					.setPlaceholder("unique_content")
+					.setValue(this.plugin.settings.notesFolder)
+					.onChange(async (value) => {
+						this.plugin.settings.notesFolder = value || "unique_content";
+						await this.plugin.saveSettings();
+						const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_KARMA_NOTES);
+						if (leaves.length > 0 && leaves[0].view instanceof KarmaNotesView) {
+							await leaves[0].view.render();
+						}
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Filter properties")
+			.setDesc("Frontmatter properties to show as filters (comma-separated).")
+			.addText((text) =>
+				text
+					.setPlaceholder("tags,class,view")
+					.setValue(this.plugin.settings.filterProperties.join(","))
+					.onChange(async (value) => {
+						this.plugin.settings.filterProperties = value
+							.split(",")
+							.map((s) => s.trim())
+							.filter((s) => s.length > 0);
+						await this.plugin.saveSettings();
+						const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_KARMA_NOTES);
+						if (leaves.length > 0 && leaves[0].view instanceof KarmaNotesView) {
+							await leaves[0].view.render();
+						}
+					})
+			);
 	}
 }
