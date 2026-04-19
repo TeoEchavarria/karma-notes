@@ -1,0 +1,10 @@
+{
+	"id": "karma-notes",
+	"name": "Karma Notes",
+	"version": "1.0.0",
+	"minAppVersion": "1.4.0",
+	"description": "Reddit-style upvote/downvote for your notes. 1 voto por día, -1 por inactividad de 2 semanas, inicio en 2 puntos.",
+	"author": "Tu Nombre",
+	"authorUrl": "",
+	"isDesktopOnly": false
+}

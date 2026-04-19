@@ -1,0 +1,161 @@
+/* ═══════════════════════════════════════════
+   KARMA NOTES PLUGIN — styles.css
+   Obsidian Reddit-style voting widget
+═══════════════════════════════════════════ */
+
+/* Widget container — fixed to bottom-right of the editor pane */
+.karma-widget {
+	position: absolute;
+	bottom: 24px;
+	right: 24px;
+	z-index: 100;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	pointer-events: all;
+}
+
+.karma-inner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 12px;
+	padding: 8px 6px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 1px 4px rgba(0, 0, 0, 0.1);
+	backdrop-filter: blur(6px);
+	transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.karma-inner:hover {
+	box-shadow: 0 6px 28px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.12);
+	transform: translateY(-1px);
+}
+
+/* Buttons */
+.karma-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	margin: 0;
+	border: none;
+	border-radius: 8px;
+	background: transparent;
+	cursor: pointer;
+	color: var(--text-muted);
+	transition: color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+}
+
+.karma-btn svg {
+	width: 18px;
+	height: 18px;
+	pointer-events: none;
+}
+
+.karma-btn:hover {
+	background: var(--background-modifier-hover);
+}
+
+.karma-btn:active {
+	transform: scale(0.88);
+}
+
+/* Up button — orange on hover/active */
+.karma-up:hover {
+	color: #ff6314;
+	background: rgba(255, 99, 20, 0.1);
+}
+
+.karma-up:not(.karma-voted):hover svg {
+	filter: drop-shadow(0 0 4px rgba(255, 99, 20, 0.5));
+}
+
+/* Down button — blue on hover/active */
+.karma-down:hover {
+	color: #5b9cf6;
+	background: rgba(91, 156, 246, 0.1);
+}
+
+/* Score display */
+.karma-score {
+	font-size: 13px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.3px;
+	color: var(--text-normal);
+	line-height: 1;
+	padding: 4px 2px;
+	min-width: 24px;
+	text-align: center;
+	transition: color 0.2s ease;
+}
+
+/* Voted state */
+.karma-btn.karma-voted {
+	cursor: not-allowed;
+	opacity: 0.35;
+}
+
+.karma-btn.karma-voted:hover {
+	background: transparent;
+	color: var(--text-muted);
+}
+
+/* Voted label */
+.karma-voted-label {
+	font-size: 9px;
+	color: var(--text-faint);
+	letter-spacing: 0.3px;
+	text-align: center;
+	font-weight: 500;
+	opacity: 0.75;
+}
+
+/* Status bar */
+.karma-status-bar {
+	font-size: 12px;
+	font-weight: 600;
+}
+
+/* Score color variants based on value (handled via JS if needed) */
+.karma-score-positive {
+	color: #ff6314;
+}
+
+.karma-score-negative {
+	color: #5b9cf6;
+}
+
+.karma-score-neutral {
+	color: var(--text-muted);
+}
+
+/* Dark theme adjustments */
+.theme-dark .karma-inner {
+	background: var(--background-secondary);
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile (Obsidian mobile app) */
+@media (max-width: 600px) {
+	.karma-widget {
+		bottom: 80px;
+		right: 16px;
+	}
+
+	.karma-btn {
+		width: 38px;
+		height: 38px;
+	}
+
+	.karma-btn svg {
+		width: 22px;
+		height: 22px;
+	}
+}
