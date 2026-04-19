@@ -72,7 +72,7 @@
 	background: rgba(255, 99, 20, 0.1);
 }
 
-.karma-up:not(.karma-voted):hover svg {
+.karma-up:not(.karma-disabled):hover svg {
 	filter: drop-shadow(0 0 4px rgba(255, 99, 20, 0.5));
 }
 
@@ -96,19 +96,19 @@
 	transition: color 0.2s ease;
 }
 
-/* Voted state */
-.karma-btn.karma-voted {
+/* Disabled state (max daily change reached) */
+.karma-btn.karma-disabled {
 	cursor: not-allowed;
 	opacity: 0.35;
 }
 
-.karma-btn.karma-voted:hover {
+.karma-btn.karma-disabled:hover {
 	background: transparent;
 	color: var(--text-muted);
 }
 
-/* Voted label */
-.karma-voted-label {
+/* Daily info label */
+.karma-daily-info {
 	font-size: 9px;
 	color: var(--text-faint);
 	letter-spacing: 0.3px;
